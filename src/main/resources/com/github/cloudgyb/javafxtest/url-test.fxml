@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane prefHeight="408.0" prefWidth="553.0" xmlns="http://javafx.com/javafx/17.0.12"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.github.cloudgyb.javafxtest.view.UrlTestViewController">
+    <VBox alignment="CENTER">
+        <HBox alignment="CENTER" prefHeight="60.0" prefWidth="554.0" spacing="20.0">
+            <Label alignment="CENTER" prefHeight="23.0" prefWidth="47.0" text="测试URL" />
+            <TextField fx:id="urlInput" promptText="输入要测试的URL" />
+            <Button fx:id="urlTestBtn" onAction="#onUrlTestBtnClick" text="测试" />
+        </HBox>
+        <HBox fx:id="testResultHBox" alignment="CENTER" prefHeight="57.0" prefWidth="554.0" spacing="20.0" visible="false">
+            <Label alignment="CENTER" prefHeight="23.0" prefWidth="53.0" text="状态码：" />
+            <Label fx:id="statusCodeLabel" alignment="CENTER" layoutX="230.0" layoutY="84.0" prefHeight="23.0" prefWidth="53.0" />
+            <Label alignment="CENTER" layoutX="193.0" layoutY="84.0" prefHeight="23.0" prefWidth="75.0" text="花费时间：" />
+            <Label fx:id="loadTimeLabel" alignment="CENTER" layoutX="267.0" layoutY="84.0" prefHeight="23.0" prefWidth="53.0" />
+        </HBox>
+        <HBox fx:id="testErrorInfoHBox" alignment="CENTER" layoutX="10.0" layoutY="216.0" prefHeight="57.0" prefWidth="554.0" spacing="20.0" visible="false">
+            <Label fx:id="testErrorInfoLabel" alignment="CENTER" prefHeight="23.0" prefWidth="442.0" textAlignment="CENTER" textFill="#d92b2b" />
+        </HBox>
+    </VBox>
+    <ToolBar fx:id="statusToolBar" prefHeight="40.0" prefWidth="200.0" visible="false" StackPane.alignment="BOTTOM_LEFT">
+        <ProgressBar fx:id="statusProgressBar" prefHeight="18.0" prefWidth="152.0" progress="0.0" />
+        <Label fx:id="statusLabel" text="Label" />
+    </ToolBar>
+</StackPane>

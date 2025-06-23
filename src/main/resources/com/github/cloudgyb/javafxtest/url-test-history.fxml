@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<StackPane focusTraversable="true" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.github.cloudgyb.javafxtest.view.UrlTestHistoryViewController"
+            fx:id="stackPane">
+    <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" StackPane.alignment="TOP_LEFT">
+        <Button disable="true" mnemonicParsing="false" text="删除所选" textFill="#e42626" />
+    </ToolBar>
+    <TableView fx:id="table" prefHeight="200.0" prefWidth="200.0" StackPane.alignment="CENTER">
+        <columns>
+            <TableColumn prefWidth="40.0">
+                <graphic>
+                    <CheckBox mnemonicParsing="false" />
+                </graphic>
+            </TableColumn>
+            <TableColumn prefWidth="75.0" text="URL" />
+         <TableColumn prefWidth="75.0" text="响应码" />
+         <TableColumn prefWidth="75.0" text="消耗时间" />
+         <TableColumn prefWidth="75.0" text="成功" />
+         <TableColumn prefWidth="75.0" text="操作" />
+        </columns>
+        <StackPane.margin>
+            <Insets bottom="40.0" top="40.0" />
+        </StackPane.margin>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
+    </TableView>
+   <Pagination pageCount="100" prefHeight="200.0" prefWidth="200.0" />
+</StackPane>

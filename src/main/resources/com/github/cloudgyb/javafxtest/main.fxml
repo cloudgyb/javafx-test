@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<TabPane fx:id="mainTabPane" prefHeight="396.0" prefWidth="583.0" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/17.0.12"
+         xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.cloudgyb.javafxtest.view.MainViewController">
+    <Tab fx:id="urlTestTab" text="URL 测试">
+        <fx:include source="url-test.fxml"/>
+    </Tab>
+    <Tab fx:id="urlTestHistoryTab" text="URL 测试历史">
+        <fx:include source="url-test-history.fxml"/>
+    </Tab>
+</TabPane>
