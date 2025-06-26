@@ -9,6 +9,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 
 /**
  * @author cloudgyb
@@ -18,10 +20,10 @@ public class URLTesterModel {
     private final HttpClient client = HttpClient.newHttpClient();
     private final Notifications notifications = Notifications.getInstance();
 
-    public void test(String s) {
+    public void test(String url) {
         URLTestResult result;
         try {
-            HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(s)).build();
+            HttpRequest request = HttpRequest.newBuilder().GET().uri(URI.create(url)).build();
             URLTestProgress urlTestProgress = new URLTestProgress(0.2);
             URLTestProgress finalUrlTestProgress = urlTestProgress;
             Platform.runLater(
@@ -45,7 +47,12 @@ public class URLTesterModel {
         }
         URLTestResult finalResult = result;
         Platform.runLater(() -> notifications.publish(Notifications.TEST_RESULT_EVENT, finalResult));
-        //DBUtil.insert(new UrlTestHistory(url, finalResult.statusCode(), finalResult.loadTime(), finalResult.isSuccess(), e.getMessage()));
+        try {
+            DBUtil.insert(new UrlTestHistory(url, finalResult.statusCode(), finalResult.loadTime(),
+                    new Timestamp(System.currentTimeMillis()), finalResult.errorInfo()));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String exceptionToErrorMsg(Exception e) {

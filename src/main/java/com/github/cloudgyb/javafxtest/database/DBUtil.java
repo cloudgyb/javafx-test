@@ -20,18 +20,23 @@ public class DBUtil {
     public static final String DB_COLUMN_STATUS_CODE = "status_code";
     public static final String DB_COLUMN_LOAD_TIME = "load_time";
     public static final String DB_COLUMN_TEST_TIME = "test_time";
+    public static final String DB_COLUMN_TEST_ERROR_INFO = "test_error_info";
 
     public static final String DB_CREATE_TABLE_SQL = "CREATE TABLE IF NOT EXISTS " + DB_TABLE_NAME + "(" +
             DB_COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
             DB_COLUMN_URL + " TEXT NOT NULL," +
             DB_COLUMN_STATUS_CODE + " INTEGER NOT NULL," +
             DB_COLUMN_LOAD_TIME + " REAL NOT NULL," +
-            DB_COLUMN_TEST_TIME + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP" +
+            DB_COLUMN_TEST_TIME + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+            DB_COLUMN_TEST_ERROR_INFO + " TEXT DEFAULT ''" +
             ");";
     public static final String DB_INSERT_SQL = "INSERT INTO " + DB_TABLE_NAME + "(" +
             DB_COLUMN_URL + "," +
             DB_COLUMN_STATUS_CODE + "," +
-            DB_COLUMN_LOAD_TIME + ") VALUES(?,?,?)";
+            DB_COLUMN_LOAD_TIME + "," +
+            DB_COLUMN_TEST_TIME + "," +
+            DB_COLUMN_TEST_ERROR_INFO +
+            ") VALUES(?,?,?,?,?)";
     public static final String DB_SELECT_ALL_SQL = "SELECT * FROM " + DB_TABLE_NAME;
     public static final String DB_DELETE_ALL_SQL = "DELETE FROM " + DB_TABLE_NAME;
     public static final String DB_DELETE_SQL = "DELETE FROM " + DB_TABLE_NAME + " WHERE " + DB_COLUMN_ID + "=?";
@@ -48,17 +53,18 @@ public class DBUtil {
             + "= ? ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
     public static final String DB_SELECT_SQL_BY_TEST_TIME = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
     public static final String DB_SELECT_SQL_BY_TEST_TIME_DESC = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " ASC";
-    public static final String DB_SELECT_SQL_BY_TEST_TIME_ASC = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
-    public static final String DB_SELECT_SQL_BY_TEST_TIME_ASC_DESC = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " ASC";
-    public static final String DB_SELECT_SQL_BY_TEST_TIME_DESC_ASC = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
-    public static final String DB_SELECT_SQL_BY_TEST_TIME_DESC_ASC_DESC = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
-    public static final String DB_SELECT_SQL_BY_TEST_TIME_DESC_ASC_DESC_DESC = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
-    public static final String DB_SELECT_SQL_BY_TEST_TIME_DESC_ASC_DESC_DESC_DESC = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
 
-    public static final String DB_SELECT_SQL_BY_TEST_TIME_DESC_ASC_DESC_DESC_DESC_DESC = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
-
-    public static final String DB_SELECT_SQL_BY_TEST_TIME_DESC_ASC_DESC_DESC_DESC_DESC_DESC = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
-    private static final String DB_COLUMN_TEST_ERROR_INFO = "error_info";
+    static {
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             PreparedStatement ps = conn.prepareStatement(DB_CREATE_TABLE_SQL)) {
+            int i = ps.executeUpdate();
+            if (i > 0) {
+                System.out.println("创建表成功");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static List<UrlTestHistory> selectAll() throws SQLException {
         List<UrlTestHistory> list = new ArrayList<>();
