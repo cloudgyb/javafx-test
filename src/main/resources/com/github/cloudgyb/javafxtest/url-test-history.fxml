@@ -4,7 +4,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane fx:id="stackPane" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.cloudgyb.javafxtest.view.UrlTestHistoryViewController">
+<StackPane fx:id="stackPane" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.github.cloudgyb.javafxtest.view.UrlTestHistoryViewController">
     <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" StackPane.alignment="TOP_LEFT">
         <Button fx:id="deleteSelectedBtn" mnemonicParsing="false" text="删除所选" textFill="#e42626" />
     </ToolBar>
@@ -18,7 +19,7 @@
             <TableColumn fx:id="urlColumn" prefWidth="75.0" text="URL" />
             <TableColumn fx:id="statusCodeColumn" prefWidth="75.0" text="响应码" />
             <TableColumn fx:id="loadTimeColumn" prefWidth="75.0" text="消耗时间" />
-            <TableColumn fx:id="successColumn" prefWidth="75.0" text="成功" />
+            <TableColumn fx:id="successColumn" prefWidth="75.0" text="测试结果" />
             <TableColumn fx:id="actionColumn" prefWidth="75.0" text="操作" />
         </columns>
         <StackPane.margin>

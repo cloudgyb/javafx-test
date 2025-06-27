@@ -104,4 +104,18 @@ public class DBUtil {
     private static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
     }
+
+    public static void delete(Integer id) {
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(DB_DELETE_SQL)) {
+            ps.setInt(1, id);
+            int i = ps.executeUpdate();
+            if (i > 0) {
+                System.out.println("删除成功");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }

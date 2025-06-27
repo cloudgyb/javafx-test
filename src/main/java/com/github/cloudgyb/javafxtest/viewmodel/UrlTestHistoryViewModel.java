@@ -1,5 +1,6 @@
 package com.github.cloudgyb.javafxtest.viewmodel;
 
+import com.github.cloudgyb.javafxtest.database.DBUtil;
 import com.github.cloudgyb.javafxtest.domain.UrlTestHistory;
 import javafx.beans.property.*;
 
@@ -30,7 +31,8 @@ public class UrlTestHistoryViewModel {
         String testTime = simpleDateFormat.format(testTimestamp);
         this.testTime.set(testTime);
         this.testErrorInfo.set(urlTestHistory.getTestErrorInfo());
-        this.success.set(urlTestHistory.getTestErrorInfo() == null ? "成功" : "失败");
+        this.success.set(urlTestHistory.getTestErrorInfo() == null ||
+                urlTestHistory.getTestErrorInfo().isEmpty() ? "成功" : "失败");
     }
 
     public SimpleIntegerProperty idProperty() {
@@ -74,5 +76,9 @@ public class UrlTestHistoryViewModel {
         return new UrlTestHistory(url.get(), status.get(),
                 loadTime.get(),
                 Timestamp.valueOf(testTime.get()), testErrorInfo.get());
+    }
+
+    public void delete() {
+        DBUtil.delete(id.get());
     }
 }

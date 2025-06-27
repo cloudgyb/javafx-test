@@ -2,8 +2,6 @@ package com.github.cloudgyb.javafxtest.view;
 
 import com.github.cloudgyb.javafxtest.database.DBUtil;
 import com.github.cloudgyb.javafxtest.viewmodel.UrlTestHistoryViewModel;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -54,6 +52,7 @@ public class UrlTestHistoryViewController {
             }
 
             if (confirmDelete(checkedViewModels.size())) {
+                checkedViewModels.forEach(UrlTestHistoryViewModel::delete);
                 table.getItems().removeIf(UrlTestHistoryViewModel::isChecked);
             }
         });
@@ -136,6 +135,7 @@ public class UrlTestHistoryViewController {
 
     private void delete(UrlTestHistoryViewModel testHistoryViewModel) {
         if (confirmDelete(1)) {
+            testHistoryViewModel.delete();
             table.getItems().remove(testHistoryViewModel);
         }
     }
@@ -146,6 +146,7 @@ public class UrlTestHistoryViewController {
         alert.setHeaderText(testHistoryViewModel.urlProperty().get());
 
         VBox content = new VBox(10);
+        content.setPrefWidth(300);
         content.setPadding(new Insets(10));
         content.getChildren().addAll(
                 new Label("ID: " + testHistoryViewModel.idProperty().get()),
@@ -163,9 +164,9 @@ public class UrlTestHistoryViewController {
     // 确认删除对话框
     private boolean confirmDelete(int count) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm Delete");
+        alert.setTitle("确认删除");
         alert.setHeaderText(null);
-        alert.setContentText("Are you sure you want to delete " + count + " item(s)?");
+        alert.setContentText("确定要删除这" + count + "项吗?");
 
         Optional<ButtonType> result = alert.showAndWait();
         return result.isPresent() && result.get() == ButtonType.OK;
