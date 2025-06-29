@@ -1,10 +1,13 @@
 package com.github.cloudgyb.javafxtest.view;
 
 import com.github.cloudgyb.javafxtest.database.DBUtil;
+import com.github.cloudgyb.javafxtest.database.Page;
+import com.github.cloudgyb.javafxtest.domain.UrlTestHistory;
 import com.github.cloudgyb.javafxtest.viewmodel.UrlTestHistoryViewModel;
 import javafx.collections.transformation.FilteredList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -22,6 +25,7 @@ import java.util.Optional;
  * @since 2025/6/23 20:38
  */
 public class UrlTestHistoryViewController {
+    private final static int PAGE_SIZE = 20;
     public StackPane stackPane;
     public TableView<UrlTestHistoryViewModel> table;
     public CheckBox selectAllCheckBox;
@@ -32,6 +36,7 @@ public class UrlTestHistoryViewController {
     public TableColumn<UrlTestHistoryViewModel, String> successColumn;
     public TableColumn<UrlTestHistoryViewModel, Void> actionColumn;
     public Button deleteSelectedBtn;
+    public Pagination pagination;
 
     public void initialize() {
         System.out.println("UrlTestHistoryViewController.initialize()");
@@ -54,6 +59,7 @@ public class UrlTestHistoryViewController {
             if (confirmDelete(checkedViewModels.size())) {
                 checkedViewModels.forEach(UrlTestHistoryViewModel::delete);
                 table.getItems().removeIf(UrlTestHistoryViewModel::isChecked);
+                refreshDataIfCurrPageIsEmpty();
             }
         });
         table.getSortOrder().add(urlColumn);
@@ -69,23 +75,43 @@ public class UrlTestHistoryViewController {
         successColumn.setCellValueFactory(new PropertyValueFactory<>("success"));
         actionColumn.setCellFactory(createActionCellFactory());
         stackPane.addEventHandler(Tab.SELECTION_CHANGED_EVENT, event -> {
-            System.out.println("UrlTestHistoryViewController.table.addEventHandler()");
             event.consume();
-            refreshData();
+            System.out.println("UrlTestHistoryViewController.table.addEventHandler()");
+            selectAllCheckBox.setSelected(false);
+            pagination.setCurrentPageIndex(0);
+            getPageData(0);
         });
+        pagination.setPageFactory(this::getPageData);
     }
 
-    public void refreshData() {
-        System.out.println("UrlTestHistoryViewController.refreshData()");
+    /**
+     * 注意：pageIndex 从0开始
+     *
+     * @param pageIndex 页码索引
+     * @return 表格table
+     */
+    public Node getPageData(int pageIndex) {
         try {
             table.getItems().clear();
-            DBUtil.selectAll().forEach(urlTestHistory -> {
+            Page<UrlTestHistory> page = DBUtil.selectPage(pageIndex, PAGE_SIZE);
+            int totalPage = page.getTotalPage();
+            pagination.setPageCount(totalPage);
+            // 会导致加载数据死循环，导致栈溢出，所以注掉了
+            /*if (totalPage == 0) {
+                pagination.setMaxPageIndicatorCount(1);
+                pagination.setDisable(true);
+            } else {
+                pagination.setMaxPageIndicatorCount(10);
+                pagination.setDisable(false);
+            }*/
+            page.getList().forEach(urlTestHistory -> {
                 UrlTestHistoryViewModel urlTestHistoryViewModel = new UrlTestHistoryViewModel(urlTestHistory);
                 table.getItems().add(urlTestHistoryViewModel);
             });
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return table;
     }
 
 
@@ -137,6 +163,16 @@ public class UrlTestHistoryViewController {
         if (confirmDelete(1)) {
             testHistoryViewModel.delete();
             table.getItems().remove(testHistoryViewModel);
+            refreshDataIfCurrPageIsEmpty();
+        }
+    }
+
+    private void refreshDataIfCurrPageIsEmpty() {
+        if (table.getItems().isEmpty()) {
+            int prePageNumber = pagination.getCurrentPageIndex() - 1;
+            int currPageNumber = Math.max(prePageNumber, 0);
+            pagination.setCurrentPageIndex(currPageNumber);
+            getPageData(currPageNumber);
         }
     }
 

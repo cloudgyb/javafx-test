@@ -5,6 +5,7 @@ import com.github.cloudgyb.javafxtest.domain.UrlTestHistory;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * @author cloudgyb
@@ -40,19 +41,19 @@ public class DBUtil {
     public static final String DB_SELECT_ALL_SQL = "SELECT * FROM " + DB_TABLE_NAME;
     public static final String DB_DELETE_ALL_SQL = "DELETE FROM " + DB_TABLE_NAME;
     public static final String DB_DELETE_SQL = "DELETE FROM " + DB_TABLE_NAME + " WHERE " + DB_COLUMN_ID + "=?";
-    public static final String DB_UPDATE_SQL = "UPDATE " + DB_TABLE_NAME + " SET " +
-            DB_COLUMN_URL + "=?," +
-            DB_COLUMN_STATUS_CODE + "=?," +
-            DB_COLUMN_LOAD_TIME + "=? WHERE "
-            + DB_COLUMN_ID + "=?";
     public static final String DB_SELECT_SQL = "SELECT * FROM " + DB_TABLE_NAME + " WHERE " + DB_COLUMN_ID + "=?";
     public static final String DB_SELECT_SQL_BY_URL = "SELECT * FROM " + DB_TABLE_NAME + " WHERE " + DB_COLUMN_URL + "=?";
     public static final String DB_SELECT_SQL_BY_STATUS_CODE = "SELECT * FROM " + DB_TABLE_NAME + " WHERE " + DB_COLUMN_STATUS_CODE
             + "= ? ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
     public static final String DB_SELECT_SQL_BY_LOAD_TIME = "SELECT * FROM " + DB_TABLE_NAME + " WHERE " + DB_COLUMN_LOAD_TIME
             + "= ? ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
-    public static final String DB_SELECT_SQL_BY_TEST_TIME = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
-    public static final String DB_SELECT_SQL_BY_TEST_TIME_DESC = "SELECT * FROM " + DB_TABLE_NAME + " ORDER BY " + DB_COLUMN_TEST_TIME + " ASC";
+    public static final String DB_SELECT_SQL_BY_TEST_TIME = "SELECT * FROM " + DB_TABLE_NAME +
+            " ORDER BY " + DB_COLUMN_TEST_TIME + " AES";
+    public static final String DB_SELECT_SQL_BY_TEST_TIME_DESC = "SELECT * FROM " + DB_TABLE_NAME +
+            " ORDER BY " + DB_COLUMN_TEST_TIME + " DESC";
+    public static final String DB_PAGE_COUNT_SQL = "SELECT COUNT(*) FROM " + DB_TABLE_NAME;
+    public static final String DB_PAGE_SQL_BY_TEST_TIME_DESC = "SELECT * FROM " + DB_TABLE_NAME +
+            " ORDER BY " + DB_COLUMN_TEST_TIME + " DESC LIMIT ?,?";
 
     static {
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
@@ -62,8 +63,33 @@ public class DBUtil {
                 System.out.println("创建表成功");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+    }
+
+    public static Page<UrlTestHistory> selectPage(int pageNum, int pageSize) throws SQLException {
+        List<UrlTestHistory> list = new ArrayList<>(pageSize);
+        long total = 0;
+        // count
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             PreparedStatement ps = conn.prepareStatement(DB_PAGE_COUNT_SQL)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                total = rs.getLong(1);
+            }
+        }
+        // page
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             PreparedStatement ps = conn.prepareStatement(DB_PAGE_SQL_BY_TEST_TIME_DESC)) {
+            ps.setInt(1, pageNum * pageSize);
+            ps.setInt(2, pageSize);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                UrlTestHistory urlTestHistory = rowHandler.apply(rs);
+                list.add(urlTestHistory);
+            }
+        }
+        return new Page<>(total, pageNum, pageSize, list);
     }
 
     public static List<UrlTestHistory> selectAll() throws SQLException {
@@ -72,14 +98,7 @@ public class DBUtil {
              PreparedStatement ps = conn.prepareStatement(DB_SELECT_ALL_SQL)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                UrlTestHistory urlTestHistory = new UrlTestHistory();
-                urlTestHistory.setId(rs.getInt(DB_COLUMN_ID));
-                urlTestHistory.setUrl(rs.getString(DB_COLUMN_URL));
-
-                urlTestHistory.setStatusCode(rs.getInt(DB_COLUMN_STATUS_CODE));
-                urlTestHistory.setLoadTime(rs.getLong(DB_COLUMN_LOAD_TIME));
-                urlTestHistory.setTestTime(rs.getTimestamp(DB_COLUMN_TEST_TIME));
-                urlTestHistory.setTestErrorInfo(rs.getString(DB_COLUMN_TEST_ERROR_INFO));
+                UrlTestHistory urlTestHistory = rowHandler.apply(rs);
                 list.add(urlTestHistory);
             }
         }
@@ -116,6 +135,33 @@ public class DBUtil {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
+
+
+    public static void deleteAll() {
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(DB_DELETE_ALL_SQL)) {
+            int i = ps.executeUpdate();
+            if (i > 0) {
+                System.out.println("删除成功");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final Function<ResultSet, UrlTestHistory> rowHandler = (rs) -> {
+        try {
+            UrlTestHistory urlTestHistory = new UrlTestHistory();
+            urlTestHistory.setId(rs.getInt(DB_COLUMN_ID));
+            urlTestHistory.setUrl(rs.getString(DB_COLUMN_URL));
+            urlTestHistory.setStatusCode(rs.getInt(DB_COLUMN_STATUS_CODE));
+            urlTestHistory.setLoadTime(rs.getLong(DB_COLUMN_LOAD_TIME));
+            urlTestHistory.setTestTime(rs.getTimestamp(DB_COLUMN_TEST_TIME));
+            urlTestHistory.setTestErrorInfo(rs.getString(DB_COLUMN_TEST_ERROR_INFO));
+            return urlTestHistory;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    };
 }

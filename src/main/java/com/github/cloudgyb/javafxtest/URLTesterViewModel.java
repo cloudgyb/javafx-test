@@ -31,7 +31,7 @@ public class URLTesterViewModel {
     private final URLTesterModel model = new URLTesterModel();
 
     public URLTesterViewModel() {
-        this.urlProperty = new SimpleStringProperty("");
+        this.urlProperty = new SimpleStringProperty("https://www.baidu.com");
         this.statusProperty = new SimpleStringProperty("");
         this.testingProperty = new SimpleBooleanProperty(false);
         this.testSuccessProperty = new SimpleBooleanProperty(false);

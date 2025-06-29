@@ -6,28 +6,29 @@
 
 <StackPane fx:id="stackPane" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.github.cloudgyb.javafxtest.view.UrlTestHistoryViewController">
+    <Pagination fx:id="pagination" pageCount="100" prefHeight="57.0" prefWidth="200.0"
+                StackPane.alignment="BOTTOM_CENTER"/>
     <ToolBar nodeOrientation="RIGHT_TO_LEFT" prefHeight="40.0" StackPane.alignment="TOP_LEFT">
-        <Button fx:id="deleteSelectedBtn" mnemonicParsing="false" text="删除所选" textFill="#e42626" />
+        <Button fx:id="deleteSelectedBtn" mnemonicParsing="false" text="删除所选" textFill="#e42626"/>
     </ToolBar>
     <TableView fx:id="table" editable="true" prefHeight="200.0" prefWidth="200.0" StackPane.alignment="CENTER">
         <columns>
-            <TableColumn fx:id="selectColumn" prefWidth="40.0">
+            <TableColumn fx:id="selectColumn" prefWidth="40.0" sortable="false">
                 <graphic>
-                    <CheckBox fx:id="selectAllCheckBox" mnemonicParsing="false" />
+                    <CheckBox fx:id="selectAllCheckBox" mnemonicParsing="false"/>
                 </graphic>
             </TableColumn>
-            <TableColumn fx:id="urlColumn" prefWidth="75.0" text="URL" />
-            <TableColumn fx:id="statusCodeColumn" prefWidth="75.0" text="响应码" />
-            <TableColumn fx:id="loadTimeColumn" prefWidth="75.0" text="消耗时间" />
-            <TableColumn fx:id="successColumn" prefWidth="75.0" text="测试结果" />
-            <TableColumn fx:id="actionColumn" prefWidth="75.0" text="操作" />
+            <TableColumn fx:id="urlColumn" prefWidth="75.0" text="URL"/>
+            <TableColumn fx:id="statusCodeColumn" prefWidth="75.0" text="响应码"/>
+            <TableColumn fx:id="loadTimeColumn" prefWidth="75.0" text="消耗时间"/>
+            <TableColumn fx:id="successColumn" prefWidth="75.0" text="测试结果"/>
+            <TableColumn fx:id="actionColumn" prefWidth="75.0" text="操作"/>
         </columns>
         <StackPane.margin>
-            <Insets bottom="40.0" top="40.0" />
+            <Insets bottom="40.0" top="40.0"/>
         </StackPane.margin>
         <columnResizePolicy>
-            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
         </columnResizePolicy>
     </TableView>
-    <!--<Pagination pageCount="100" prefHeight="57.0" prefWidth="200.0" StackPane.alignment="BOTTOM_CENTER" />-->
 </StackPane>
