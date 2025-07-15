@@ -20,8 +20,6 @@ build:
     - tags
     - main
     - /^release\/.*$/
-  tags:
-    - x86
   cache:
     key: maven-repo
     paths:
