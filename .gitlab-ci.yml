@@ -1,0 +1,39 @@
+stages:
+  - build
+  - trivy-scan
+
+
+variables:
+  MAVEN_REPO_DIR: "$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_OPTS: "-Dmaven.repo.local=$MAVEN_REPO_DIR"
+
+
+before_script:
+  - echo "Java and Maven environment setup complete."
+  - export VERSION=$(cat $VERSION_FILE)
+  - echo "Version is $VERSION"
+
+build:
+  stage: build
+  only:
+    - merge_requests
+    - tags
+    - main
+    - /^release\/.*$/
+  tags:
+    - x86
+  cache:
+    key: maven-repo
+    paths:
+      - $MAVEN_REPO_DIR
+    when: always
+    unprotect: false
+  script:
+    - ls "$MAVEN_REPO_DIR" || echo "not found $MAVEN_REPO_DIR"
+    - timeout 30m mvn clean package ${MAVEN_OPTS} -DskipTests
+  artifacts:
+    name: javafx-test
+    expire_in: 1min
+    paths:
+      - target
+  allow_failure: false
